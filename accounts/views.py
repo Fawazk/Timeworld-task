@@ -38,7 +38,7 @@ def login(request):
         print(email)
         password = request.POST['password']
         print(password)
-        user = auth.authenticate(email=email, password=password)
+        user = auth.authenticate(email=email,password=password)
         print(user)
         if user is not None:
             if user.is_admin:

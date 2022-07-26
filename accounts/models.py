@@ -9,12 +9,12 @@ Role=(
     ('student','student'),
     ('staff','staff'),
     ('editor','editor'),
+    ('admin','admin'),
 )
 class MyAccountManager(BaseUserManager):
     def create_user(self,Name,Mobile,email,Role,Nationality,Country,password=None):
         if not email:
             raise ValueError('User must have an email address ')
-
         if not Name:
             raise ValueError('User must have an Name')
         if not Role:
@@ -27,6 +27,7 @@ class MyAccountManager(BaseUserManager):
             email = self.normalize_email(email),
             Name = Name,
             Mobile = Mobile,
+            Role = Role,
             Nationality=Nationality,
             Country=Country,
         )
@@ -35,16 +36,19 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self,Name,email,password,Mobile):
+    def create_superuser(self,Name,email,password,Mobile,Country,Nationality,Role):
         user = self.create_user(
             email=self.normalize_email(email),
             Name=Name,
             password=password,
             Mobile=Mobile,
-
+            Country=Country,
+            Nationality=Nationality,
+            Role = Role,
         )
         user.is_admin = True
         user.is_active =True
+        user.is_staff =True
         user.save(using=self._db)
         return user
 
@@ -52,10 +56,13 @@ class Account(AbstractBaseUser):
     Name = models.CharField(max_length=50)
     email = models.CharField(max_length=50,unique=True)
     Mobile = models.CharField(('Mobile'), max_length=10,unique=True)
-    Role = models.CharField(max_length=200,choices=Role,default='student')
+    Role = models.CharField(max_length=200,choices=Role,default=None)
     Country = models.CharField(max_length=50,null=True)
     Nationality = models.CharField(max_length=50,null=True)
     is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
 
     # required
     USERNAME_FIELD ='email'
